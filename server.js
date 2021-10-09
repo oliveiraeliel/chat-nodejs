@@ -1,5 +1,10 @@
+require("dotenv").config();
+
 const express = require("express");
 const path = require("path");
+
+const connectToDatabase = require("./database");
+connectToDatabase.connectToDatabase();
 
 const app = express();
 const server = require("http").createServer(app);
@@ -10,21 +15,21 @@ app.set("views", path.join(__dirname, 'public'));
 app.engine("html", require('ejs').renderFile);
 app.set("view engine", "html");
 
-app.use('/', (req, res) =>{
+app.use('/', (req, res) => {
     res.render('index.html');
 });
 
 let messages = [];
 
-io.on("connection", socket =>{
+io.on("connection", socket => {
     console.log(`Socket conectado: ${socket.id}`);
 
     socket.emit("previousMessages", messages);
-    
-    socket.on("sendMessage", data =>{
+
+    socket.on("sendMessage", data => {
         messages.push(data);
         socket.broadcast.emit("receivedMessage", data)
     })
 });
 
-server.listen(3000);
+server.listen(27017);
